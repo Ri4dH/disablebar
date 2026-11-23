@@ -39,10 +39,21 @@ DisableBar adds a switch for it. It lives in your menu bar, needs no admin right
 
 <table>
   <tr>
-    <td align="center" width="62%"><img src="docs/assets/window.png" alt="DisableBar main window"><br><sub>Main window</sub></td>
-    <td align="center" valign="top"><img src="docs/assets/menu.png" alt="DisableBar menu bar popover"><br><sub>Menu bar popover</sub></td>
+    <td align="center" width="50%"><img src="docs/assets/window-dark.png" alt="DisableBar main window in dark mode"><br><sub>Dark mode</sub></td>
+    <td align="center" width="50%"><img src="docs/assets/window-light.png" alt="DisableBar main window in light mode"><br><sub>Light mode</sub></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><img src="docs/assets/menu.png" alt="DisableBar menu bar popover" width="300"><br><sub>Menu bar popover</sub></td>
   </tr>
 </table>
+
+## Design
+
+The interface follows Meta's open-source [**Astryx**](https://github.com/meta/astryx) design system (Neutral theme), ported to SwiftUI in [`src/DisableBar/Design`](src/DisableBar/Design):
+
+* **Tokens:** Neutral's light and dark semantic colors, hue ramps, 4-pt spacing ladder, radii (6 / 10 / 12), control heights (28 / 32 / 36), 14-pt / 1.2 type scale, layered shadows with the dark-mode rim bezel, and its 125 / 300 ms motion curve.
+* **Components:** Button (primary, secondary, ghost, destructive), Switch, Card, Section, Item, Badge, Banner, SegmentedControl and Kbd, built to Astryx's specs.
+* **Type:** Set in [Figtree](https://github.com/erikdkennedy/figtree), the Neutral theme's typeface, bundled under the SIL Open Font License.
 
 ## Install
 
@@ -113,7 +124,9 @@ Quit DisableBar from the menu bar and delete it from Applications. If you enable
 
 ```
 src/DisableBar/          SwiftUI app: state, menu bar, windows, hotkey, helpers
+src/DisableBar/Design/   Astryx tokens + components ported to SwiftUI
 src/TouchBarPrivate/     Objective-C shim around the private Touch Bar API
+assets/fonts/            Figtree (SIL OFL 1.1)
 scripts/build-app.sh     Builds, icons, signs and zips DisableBar.app
 scripts/make-icon.swift  Renders the app icon
 docs/assets/             README artwork
@@ -121,4 +134,4 @@ docs/assets/             README artwork
 
 ## License
 
-[MIT](LICENSE). DisableBar isn't affiliated with Apple. “Touch Bar” and “MacBook Pro” are trademarks of Apple Inc.
+[MIT](LICENSE). Design tokens adapted from [Astryx](https://github.com/meta/astryx) (MIT, © Meta Platforms, Inc.). Figtree is licensed under the [SIL OFL 1.1](assets/fonts/figtree.LICENSE.txt). DisableBar isn't affiliated with Apple or Meta. “Touch Bar” and “MacBook Pro” are trademarks of Apple Inc.

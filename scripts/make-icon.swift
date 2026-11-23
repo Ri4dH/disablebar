@@ -26,11 +26,10 @@ ctx.restoreGState()
 // Background gradient
 ctx.saveGState()
 tilePath.addClip()
-NSGradient(colors: [NSColor(calibratedRed: 0.17, green: 0.15, blue: 0.30, alpha: 1),
-                    NSColor(calibratedRed: 0.05, green: 0.05, blue: 0.09, alpha: 1)])!
+NSGradient(colors: [NSColor(hex: 0x303030), NSColor(hex: 0x111111)])!
     .draw(in: tile, angle: -90)
 // Soft pink glow behind the bar
-NSGradient(colors: [NSColor(calibratedRed: 1, green: 0.3, blue: 0.45, alpha: 0.35), .clear])!
+NSGradient(colors: [NSColor(hex: 0xff705d).withAlphaComponent(0.20), .clear])!
     .draw(fromCenter: NSPoint(x: 512, y: 512), radius: 0, toCenter: NSPoint(x: 512, y: 512), radius: 420, options: [])
 ctx.restoreGState()
 
@@ -47,7 +46,7 @@ ctx.restoreGState()
 let bar = NSRect(x: 172, y: 452, width: 680, height: 120)
 let barPath = NSBezierPath(roundedRect: bar, xRadius: 30, yRadius: 30)
 ctx.saveGState()
-ctx.setShadow(offset: .zero, blur: 40, color: NSColor(calibratedRed: 0.4, green: 0.8, blue: 1, alpha: 0.35).cgColor)
+ctx.setShadow(offset: .zero, blur: 40, color: NSColor(hex: 0x6d9cfe).withAlphaComponent(0.30).cgColor)
 NSColor.black.setFill()
 barPath.fill()
 ctx.restoreGState()
@@ -57,7 +56,7 @@ NSColor.black.setFill()
 NSBezierPath(roundedRect: bar.insetBy(dx: 5, dy: 5), xRadius: 26, yRadius: 26).fill()
 
 // Faint keys inside the bar
-let keyColor = NSColor.white.withAlphaComponent(0.14)
+let keyColor = NSColor(hex: 0x303030)
 keyColor.setFill()
 for (x, w) in [(195.0, 90.0), (310.0, 70.0), (395.0, 70.0), (480.0, 70.0), (640.0, 60.0), (715.0, 60.0)] {
     NSBezierPath(roundedRect: NSRect(x: x, y: 478, width: w, height: 68), xRadius: 12, yRadius: 12).fill()
@@ -73,7 +72,7 @@ func slashPath() -> NSBezierPath {
 }
 let gap = slashPath()
 gap.lineWidth = 120
-NSColor(calibratedRed: 0.08, green: 0.07, blue: 0.13, alpha: 1).setStroke()
+NSColor(hex: 0x1b1b1b).setStroke()
 ctx.saveGState()
 tilePath.addClip()
 gap.stroke()
@@ -87,15 +86,20 @@ ctx.setLineWidth(66)
 ctx.setLineCap(.round)
 ctx.replacePathWithStrokedPath()
 ctx.clip()
-NSGradient(colors: [NSColor(calibratedRed: 1, green: 0.55, blue: 0.25, alpha: 1),
-                    NSColor(calibratedRed: 1, green: 0.25, blue: 0.45, alpha: 1),
-                    NSColor(calibratedRed: 0.85, green: 0.2, blue: 0.75, alpha: 1)])!
+NSGradient(colors: [NSColor(hex: 0xff705d), NSColor(hex: 0xff9890)])!
     .draw(in: NSRect(x: 250, y: 200, width: 524, height: 624), angle: 60)
 ctx.restoreGState()
 
 NSGraphicsContext.restoreGraphicsState()
 try! rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: output))
 print("wrote \(output)")
+
+extension NSColor {
+    convenience init(hex: UInt32) {
+        self.init(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+                  blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+    }
+}
 
 extension NSBezierPath {
     var cgPathCompat: CGPath {

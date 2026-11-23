@@ -1,35 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="Animation: a flickering Touch Bar is switched off by DisableBar, then ghost touches are blocked">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1d1a33"/>
-      <stop offset="1" stop-color="#0b0b12"/>
+      <stop offset="0" stop-color="#262626"/>
+      <stop offset="1" stop-color="#111111"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.42" r="0.55">
-      <stop offset="0" stop-color="#ff4d7a" stop-opacity="0.28"/>
-      <stop offset="1" stop-color="#ff4d7a" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ff705d" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ff705d" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="deck" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3a3b42"/>
-      <stop offset="1" stop-color="#25262b"/>
+      <stop offset="0" stop-color="#303030"/>
+      <stop offset="1" stop-color="#1b1b1b"/>
     </linearGradient>
     <linearGradient id="barEdge" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
       <stop offset="1" stop-color="#ffffff" stop-opacity="0.05"/>
     </linearGradient>
     <linearGradient id="onGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#33d68f"/>
-      <stop offset="1" stop-color="#1aa8db"/>
+      <stop offset="0" stop-color="#f1f1f1"/>
+      <stop offset="1" stop-color="#f1f1f1"/>
     </linearGradient>
     <linearGradient id="offGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff5461"/>
-      <stop offset="1" stop-color="#ed2e87"/>
+      <stop offset="0" stop-color="#525252"/>
+      <stop offset="1" stop-color="#525252"/>
     </linearGradient>
     <filter id="soft" x="-20%" y="-200%" width="140%" height="500%">
       <feGaussianBlur stdDeviation="10"/>
     </filter>
     <clipPath id="barClip"><rect x="130" y="128" width="700" height="48" rx="9"/></clipPath>
     <style>
-      text { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; }
+      text { font-family: Figtree, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; }
       .cycle { animation-duration: 8s; animation-iteration-count: infinite; animation-timing-function: linear; }
 
       /* Touch Bar content: flickers, then switches off */
@@ -97,7 +97,7 @@
   <rect x="90" y="96" width="780" height="330" rx="26" fill="url(#deck)"/>
   <rect x="90" y="96" width="780" height="330" rx="26" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
   <!-- key rows -->
-  <g fill="#141418">
+  <g fill="#111111">
     <rect x="130" y="196" width="50" height="46" rx="7"/><rect x="186" y="196" width="50" height="46" rx="7"/>
     <rect x="242" y="196" width="50" height="46" rx="7"/><rect x="298" y="196" width="50" height="46" rx="7"/>
     <rect x="354" y="196" width="50" height="46" rx="7"/><rect x="410" y="196" width="50" height="46" rx="7"/>
@@ -113,7 +113,7 @@
   </g>
 
   <!-- Touch Bar glow (only while on) -->
-  <rect class="cycle barGlow" x="150" y="136" width="660" height="32" rx="12" fill="#3ec7ff" filter="url(#soft)"/>
+  <rect class="cycle barGlow" x="150" y="136" width="660" height="32" rx="12" fill="#6d9cfe" filter="url(#soft)"/>
 
   <!-- Touch Bar -->
   <rect x="128" y="126" width="704" height="52" rx="11" fill="url(#barEdge)"/>
@@ -121,26 +121,26 @@
 
   <g clip-path="url(#barClip)">
     <g class="cycle tbOn">
-      <rect x="138" y="134" width="62" height="36" rx="7" fill="#3a3a3c"/>
+      <rect x="138" y="134" width="62" height="36" rx="7" fill="#303030"/>
       <text x="169" y="157" fill="#fff" font-size="14" text-anchor="middle">esc</text>
-      <rect x="232" y="134" width="56" height="36" rx="7" fill="#3a3a3c"/>
+      <rect x="232" y="134" width="56" height="36" rx="7" fill="#303030"/>
       <path d="M264 144 l-8 8 8 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="294" y="134" width="56" height="36" rx="7" fill="#3a3a3c"/>
+      <rect x="294" y="134" width="56" height="36" rx="7" fill="#303030"/>
       <circle cx="322" cy="152" r="8" stroke="#fff" stroke-width="2.4" fill="none" stroke-dasharray="40 10"/>
-      <rect x="356" y="134" width="210" height="36" rx="7" fill="#3a3a3c"/>
+      <rect x="356" y="134" width="210" height="36" rx="7" fill="#303030"/>
       <circle cx="402" cy="151" r="6" stroke="#fff" stroke-width="2" fill="none"/>
       <path d="M406.5 155.5 l5 5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
       <text x="420" y="157" fill="#fff" font-size="14">Search or enter address</text>
-      <rect x="572" y="134" width="56" height="36" rx="7" fill="#3a3a3c"/>
+      <rect x="572" y="134" width="56" height="36" rx="7" fill="#303030"/>
       <path d="M600 144 v16 M592 152 h16" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
       <!-- Control strip -->
-      <rect x="660" y="134" width="40" height="36" rx="7" fill="#3a3a3c"/>
-      <circle cx="680" cy="152" r="6" fill="#ffd60a"/>
-      <rect x="704" y="134" width="40" height="36" rx="7" fill="#3a3a3c"/>
-      <path d="M714 148 h5 l6 -5 v18 l-6 -5 h-5z" fill="#5ac8fa"/>
-      <rect x="748" y="134" width="40" height="36" rx="7" fill="#3a3a3c"/>
-      <rect x="764" y="143" width="8" height="13" rx="4" fill="#bf5af2"/>
-      <rect x="792" y="134" width="30" height="36" rx="7" fill="#3a3a3c"/>
+      <rect x="660" y="134" width="40" height="36" rx="7" fill="#303030"/>
+      <circle cx="680" cy="152" r="6" fill="#e2b623"/>
+      <rect x="704" y="134" width="40" height="36" rx="7" fill="#303030"/>
+      <path d="M714 148 h5 l6 -5 v18 l-6 -5 h-5z" fill="#88bcff"/>
+      <rect x="748" y="134" width="40" height="36" rx="7" fill="#303030"/>
+      <rect x="764" y="143" width="8" height="13" rx="4" fill="#e496f6"/>
+      <rect x="792" y="134" width="30" height="36" rx="7" fill="#303030"/>
     </g>
     <!-- glitch streaks -->
     <g class="cycle glitch">
@@ -148,23 +148,23 @@
       <rect x="130" y="160" width="700" height="2" fill="#9be7ff" opacity=".7"/>
     </g>
     <text class="cycle offLabel" x="480" y="157" fill="#ffffff" fill-opacity="0.16" font-size="13" font-weight="600" letter-spacing="3" text-anchor="middle">TOUCH BAR OFF</text>
-    <circle class="cycle ripple r1" cx="300" cy="152" r="10" fill="none" stroke="#ff4d7a" stroke-width="2.5"/>
-    <circle class="cycle ripple r2" cx="690" cy="152" r="10" fill="none" stroke="#ff4d7a" stroke-width="2.5"/>
-    <circle class="cycle ripple r3" cx="470" cy="152" r="10" fill="none" stroke="#ff4d7a" stroke-width="2.5"/>
+    <circle class="cycle ripple r1" cx="300" cy="152" r="10" fill="none" stroke="#ff9890" stroke-width="2.5"/>
+    <circle class="cycle ripple r2" cx="690" cy="152" r="10" fill="none" stroke="#ff9890" stroke-width="2.5"/>
+    <circle class="cycle ripple r3" cx="470" cy="152" r="10" fill="none" stroke="#ff9890" stroke-width="2.5"/>
   </g>
 
   <!-- "Flickering" tag -->
   <g class="cycle flickerTag">
-    <rect x="404" y="62" width="152" height="30" rx="15" fill="#ff9f0a" fill-opacity="0.16"/>
-    <text x="480" y="82" fill="#ffb340" font-size="13" font-weight="600" text-anchor="middle">⚡ flickering…</text>
+    <rect x="404" y="62" width="152" height="30" rx="15" fill="#503424"/>
+    <text x="480" y="82" fill="#ffb37e" font-size="13" font-weight="600" text-anchor="middle">⚡ flickering…</text>
   </g>
 
   <!-- Ghost-touch counter -->
   <g class="cycle counterBox">
-    <rect x="356" y="58" width="248" height="34" rx="17" fill="#ff4d7a" fill-opacity="0.14"/>
-    <text x="472" y="80" fill="#ff8fa8" font-size="13" font-weight="600" text-anchor="middle">✋ ghost touches blocked:</text>
+    <rect x="356" y="58" width="248" height="34" rx="17" fill="#5b2b28"/>
+    <text x="472" y="80" fill="#ffaea7" font-size="13" font-weight="600" text-anchor="middle">✋ ghost touches blocked:</text>
   </g>
-  <g font-size="14" font-weight="700" fill="#ff8fa8" text-anchor="middle">
+  <g font-size="14" font-weight="700" fill="#ffaea7" text-anchor="middle">
     <text class="cycle c0" x="586" y="80">0</text>
     <text class="cycle c1" x="586" y="80">1</text>
     <text class="cycle c2" x="586" y="80">2</text>
@@ -173,14 +173,14 @@
 
   <!-- App power switch (top-left) -->
   <g transform="translate(40 28)">
-    <rect width="214" height="50" rx="14" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.1"/>
+    <rect width="214" height="50" rx="12" fill="#1b1b1b" stroke="#ffffff" stroke-opacity="0.12"/>
     <text x="16" y="31" fill="#fff" font-size="15" font-weight="700">DisableBar</text>
     <g transform="translate(128 12)">
       <rect width="72" height="26" rx="13" fill="url(#offGrad)"/>
       <rect class="cycle trackOn" width="72" height="26" rx="13" fill="url(#onGrad)"/>
-      <text class="cycle labelOn" x="16" y="18" fill="#fff" font-size="11" font-weight="700">ON</text>
+      <text class="cycle labelOn" x="16" y="18" fill="#111111" font-size="11" font-weight="700">ON</text>
       <text class="cycle labelOff" x="40" y="18" fill="#fff" font-size="11" font-weight="700">OFF</text>
-      <g class="cycle knob"><circle cx="59" cy="13" r="10" fill="#fff"/></g>
+      <g class="cycle knob"><circle cx="59" cy="13" r="10" fill="#e2e2e2"/><circle class="cycle trackOn" cx="59" cy="13" r="10" fill="#111111"/></g>
     </g>
   </g>
 

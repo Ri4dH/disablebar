@@ -38,10 +38,10 @@ struct TouchBarPreview: View {
                     .strokeBorder(LinearGradient(colors: [.white.opacity(0.22), .white.opacity(0.04)],
                                                  startPoint: .top, endPoint: .bottom), lineWidth: 1)
             )
-            .shadow(color: isOff ? .clear : Color.cyan.opacity(0.18), radius: 14)
+            .shadow(color: isOff ? .clear : Color(hex: "#6d9cfe").opacity(0.22), radius: 14)
         }
         .frame(height: height)
-        .animation(.easeInOut(duration: 0.45), value: isOff)
+        .animation(AX.Motion.slow, value: isOff)
         .onChange(of: blockedTouches) { _ in addRipple() }
         .task(id: isOff) { await flickerLoop() }
     }
@@ -52,8 +52,8 @@ struct TouchBarPreview: View {
             Text("TOUCH BAR OFF")
                 .tracking(2)
         }
-        .font(.system(size: height * 0.24, weight: .semibold, design: .rounded))
-        .foregroundStyle(Color.white.opacity(0.16))
+        .font(AX.font(size: height * 0.24, weight: .semibold))
+        .foregroundStyle(Color(hex: "#525252"))
     }
 
     private func onContent(width: CGFloat) -> some View {
@@ -66,10 +66,10 @@ struct TouchBarPreview: View {
             }
             Spacer(minLength: 2)
             HStack(spacing: 2) {
-                symbolKey("chevron.left", width: h * 0.7, h: h, tint: .gray)
-                symbolKey("sun.max.fill", width: h * 1.1, h: h, tint: .yellow)
-                symbolKey("speaker.wave.2.fill", width: h * 1.1, h: h, tint: .cyan)
-                symbolKey("mic.fill", width: h * 1.1, h: h, tint: .purple)
+                symbolKey("chevron.left", width: h * 0.7, h: h, tint: Color(hex: "#9e9e9e"))
+                symbolKey("sun.max.fill", width: h * 1.1, h: h, tint: AX.Palette.yellow)
+                symbolKey("speaker.wave.2.fill", width: h * 1.1, h: h, tint: AX.Palette.blue)
+                symbolKey("mic.fill", width: h * 1.1, h: h, tint: AX.Palette.purple)
             }
         }
         .padding(.horizontal, height * 0.14)
@@ -77,18 +77,18 @@ struct TouchBarPreview: View {
 
     private func key(_ text: String, width: CGFloat, h: CGFloat) -> some View {
         Text(text)
-            .font(.system(size: h * 0.38, weight: .medium))
-            .foregroundStyle(.white.opacity(0.9))
+            .font(AX.font(size: h * 0.4, weight: .medium))
+            .foregroundStyle(Color(hex: "#f1f1f1"))
             .frame(width: width, height: h)
-            .background(Color.white.opacity(0.16), in: RoundedRectangle(cornerRadius: h * 0.2))
+            .background(Color(hex: "#303030"), in: RoundedRectangle(cornerRadius: h * 0.2, style: .continuous))
     }
 
-    private func symbolKey(_ symbol: String, width: CGFloat, h: CGFloat, tint: Color = .white) -> some View {
+    private func symbolKey(_ symbol: String, width: CGFloat, h: CGFloat, tint: Color = Color(hex: "#f1f1f1")) -> some View {
         Image(systemName: symbol)
             .font(.system(size: h * 0.4, weight: .semibold))
-            .foregroundStyle(tint.opacity(0.92))
+            .foregroundStyle(tint)
             .frame(width: width, height: h)
-            .background(Color.white.opacity(0.13), in: RoundedRectangle(cornerRadius: h * 0.2))
+            .background(Color(hex: "#262626"), in: RoundedRectangle(cornerRadius: h * 0.2, style: .continuous))
     }
 
     /// Irregular brief dips in brightness while the bar is on.
@@ -128,12 +128,12 @@ private struct RippleView: View {
 
     var body: some View {
         Circle()
-            .strokeBorder(Color.pink.opacity(0.9), lineWidth: 2)
+            .strokeBorder(AX.Palette.red, lineWidth: 2)
             .frame(width: 14, height: 14)
             .scaleEffect(expanded ? 3.2 : 0.4)
             .opacity(expanded ? 0 : 1)
             .onAppear {
-                withAnimation(.easeOut(duration: 0.8)) { expanded = true }
+                withAnimation(AX.Motion.slow) { expanded = true }
             }
     }
 }

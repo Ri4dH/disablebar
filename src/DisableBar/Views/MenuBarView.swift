@@ -6,74 +6,55 @@ struct MenuBarView: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: AX.Space.s3) {
             HStack {
-                Text("DisableBar").font(.system(size: 14, weight: .bold, design: .rounded))
+                Text("DisableBar").axStyle(.heading4)
                 Spacer()
-                StatusPill(isOff: state.isTouchBarOff, peeking: state.peekSecondsLeft)
+                StatusBadge(isOff: state.isTouchBarOff, peeking: state.peekSecondsLeft)
             }
 
             TouchBarPreview(isOff: state.isTouchBarOff && state.peekSecondsLeft == nil,
                             blockedTouches: state.blockedTouchesSession, height: 30)
 
-            PowerButton(isOff: state.isTouchBarOff, compact: true) { state.toggle() }
+            Button {
+                withAnimation(AX.Motion.medium) { state.toggle() }
+            } label: {
+                Label(state.isTouchBarOff ? "Turn on Touch Bar" : "Turn off Touch Bar", systemImage: "power")
+            }
+            .buttonStyle(.ax(.primary, size: .md, fillsWidth: true))
 
             if state.isTouchBarOff {
-                menuRow(state.peekSecondsLeft.map { "Hide now (\($0)s)" } ?? "Peek for \(state.peekDuration)s",
-                        symbol: "eye") {
-                    state.peekSecondsLeft == nil ? state.peek() : state.cancelPeek()
-                }
-                HStack {
-                    Image(systemName: "hand.raised.fill").foregroundStyle(.pink)
-                    Text("\(state.blockedTouchesSession) ghost touches blocked")
+                HStack(spacing: AX.Space.s2) {
+                    Button {
+                        state.peekSecondsLeft == nil ? state.peek() : state.cancelPeek()
+                    } label: {
+                        Label(state.peekSecondsLeft.map { "Hide · \($0)s" } ?? "Peek",
+                              systemImage: state.peekSecondsLeft == nil ? "eye" : "eye.slash")
+                            .monospacedDigit()
+                    }
+                    .buttonStyle(.ax(.secondary, size: .sm))
+                    Spacer()
+                    Image(systemName: "hand.raised.fill").font(.system(size: 10)).foregroundStyle(AX.Hue.pink.icon)
+                    Text("\(state.blockedTouchesSession) blocked")
+                        .axStyle(.supporting, color: AX.Colors.textSecondary)
                         .monospacedDigit()
                 }
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 6)
             }
 
-            Divider()
+            Rectangle().fill(AX.Colors.border).frame(height: 1)
 
-            menuRow("Open DisableBar…", symbol: "macwindow") {
-                openWindow(id: "main")
-                NSApp.activate(ignoringOtherApps: true)
+            VStack(spacing: 2) {
+                AXMenuRow(title: "Open DisableBar…", symbol: "macwindow") {
+                    openWindow(id: "main")
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+                AXMenuRow(title: "Restart Touch Bar…", symbol: "arrow.clockwise") { state.restartTouchBar() }
+                AXMenuRow(title: "Quit", symbol: "xmark.circle", shortcut: "⌘Q") { NSApp.terminate(nil) }
             }
-            menuRow("Restart Touch Bar…", symbol: "arrow.clockwise") { state.restartTouchBar() }
-            menuRow("Quit", symbol: "xmark.circle", shortcut: "⌘Q") { NSApp.terminate(nil) }
+            .padding(.horizontal, -AX.Space.s2)
         }
-        .padding(14)
-        .frame(width: 290)
-    }
-
-    private func menuRow(_ title: String, symbol: String, shortcut: String? = nil,
-                         action: @escaping () -> Void) -> some View {
-        MenuRow(title: title, symbol: symbol, shortcut: shortcut, action: action)
-    }
-}
-
-private struct MenuRow: View {
-    let title: String
-    let symbol: String
-    let shortcut: String?
-    let action: () -> Void
-    @State private var hovering = false
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: symbol).frame(width: 16)
-                Text(title).monospacedDigit()
-                Spacer()
-                if let shortcut { Text(shortcut).foregroundStyle(.secondary) }
-            }
-            .font(.system(size: 13))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 5)
-            .background(hovering ? Color.primary.opacity(0.08) : .clear, in: RoundedRectangle(cornerRadius: 6))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .onHover { hovering = $0 }
+        .padding(AX.Space.s4)
+        .frame(width: 292)
+        .background(AX.Colors.backgroundPopover)
     }
 }

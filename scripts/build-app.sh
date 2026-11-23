@@ -17,6 +17,8 @@ echo "▸ Assembling bundle…"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/DisableBar"
+mkdir -p "$APP/Contents/Resources/Fonts"
+cp "$ROOT"/assets/fonts/*.woff2 "$ROOT"/assets/fonts/*.txt "$APP/Contents/Resources/Fonts/"
 
 echo "▸ Rendering icon…"
 ICONSET="$BUILD/AppIcon.iconset"

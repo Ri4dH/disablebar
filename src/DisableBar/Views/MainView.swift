@@ -1,217 +1,231 @@
 import SwiftUI
 
-/// The main window.
+/// The main window, laid out with Astryx (Neutral) tokens and components.
 struct MainView: View {
     @EnvironmentObject private var state: AppState
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: AX.Space.s6) {
                 header
                 hero
                 if state.controlStripSuspended { frozenBanner }
                 stats
-                behaviorCard
-                escapeCard
-                layoutCard
-                troubleshootingCard
+                behaviorSection
+                escapeSection
+                layoutSection
+                troubleshootingSection
                 footer
             }
-            .padding(20)
+            .padding(.horizontal, AX.Space.s6)
+            .padding(.top, AX.Space.s2)
+            .padding(.bottom, AX.Space.s6)
         }
-        .frame(width: 520)
-        .frame(minHeight: 520, idealHeight: 760, maxHeight: 1400)
-        .background(.background)
+        .scrollIndicators(.never)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            // Keeps scrolled content clear of the traffic lights.
+            AX.Colors.backgroundBody.frame(height: 40)
+        }
+        .ignoresSafeArea(.container, edges: .top)
+        .frame(width: 540)
+        .frame(minHeight: 520, idealHeight: 780, maxHeight: 1400)
+        .background(AX.Colors.backgroundBody.ignoresSafeArea())
         .overlay(alignment: .bottom) { toast }
         .onAppear { state.refreshSystemStatus() }
     }
 
-    // MARK: Sections
+    // MARK: Header
 
     private var header: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: AX.Space.s3) {
             Image(nsImage: NSApp.applicationIconImage)
                 .resizable()
                 .frame(width: 44, height: 44)
             VStack(alignment: .leading, spacing: 2) {
-                Text("DisableBar").font(.system(size: 20, weight: .bold, design: .rounded))
+                Text("DisableBar").axStyle(.heading2)
                 Text("Switch off a flickering Touch Bar.")
-                    .font(.system(size: 12)).foregroundStyle(.secondary)
+                    .axStyle(.supporting, color: AX.Colors.textSecondary)
             }
             Spacer()
-            StatusPill(isOff: state.isTouchBarOff, peeking: state.peekSecondsLeft)
+            StatusBadge(isOff: state.isTouchBarOff, peeking: state.peekSecondsLeft)
         }
-        .padding(.top, 8)
     }
 
+    // MARK: Hero
+
     private var hero: some View {
-        VStack(spacing: 16) {
-            TouchBarPreview(isOff: state.isTouchBarOff && state.peekSecondsLeft == nil,
-                            blockedTouches: state.blockedTouchesSession)
-                .padding(.horizontal, 4)
+        AXCard(padding: AX.Space.s5, elevation: .med) {
+            VStack(alignment: .leading, spacing: AX.Space.s4) {
+                TouchBarPreview(isOff: state.isTouchBarOff && state.peekSecondsLeft == nil,
+                                blockedTouches: state.blockedTouchesSession)
 
-            PowerButton(isOff: state.isTouchBarOff) { state.toggle() }
-
-            HStack {
-                if state.isTouchBarOff {
-                    Button {
-                        state.peekSecondsLeft == nil ? state.peek() : state.cancelPeek()
-                    } label: {
-                        Label(state.peekSecondsLeft.map { "Hide now (\($0)s)" } ?? "Peek for \(state.peekDuration)s",
-                              systemImage: state.peekSecondsLeft == nil ? "eye" : "eye.slash")
-                    }
-                    .buttonStyle(.borderless)
-                    .font(.system(size: 12, weight: .medium))
+                Button {
+                    withAnimation(AX.Motion.medium) { state.toggle() }
+                } label: {
+                    Label(state.isTouchBarOff ? "Turn on Touch Bar" : "Turn off Touch Bar", systemImage: "power")
                 }
-                Spacer()
-                if state.hotKeyEnabled {
-                    HStack(spacing: 6) {
-                        Text("Shortcut").font(.system(size: 11)).foregroundStyle(.secondary)
-                        KeyCaps(keys: ["⌃", "⌥", "⌘", "T"])
+                .buttonStyle(.ax(.primary, size: .lg, fillsWidth: true))
+                .keyboardShortcut(.defaultAction)
+
+                HStack(spacing: AX.Space.s2) {
+                    if state.isTouchBarOff {
+                        Button {
+                            state.peekSecondsLeft == nil ? state.peek() : state.cancelPeek()
+                        } label: {
+                            Label(state.peekSecondsLeft.map { "Hide now · \($0)s" } ?? "Peek for \(peekLabel)",
+                                  systemImage: state.peekSecondsLeft == nil ? "eye" : "eye.slash")
+                                .monospacedDigit()
+                        }
+                        .buttonStyle(.ax(.ghost, size: .sm))
+                    }
+                    Spacer()
+                    if state.hotKeyEnabled {
+                        Text("Shortcut").axStyle(.supporting, color: AX.Colors.textSecondary)
+                        AXKbd(keys: ["⌃", "⌥", "⌘", "T"])
                     }
                 }
-            }
-            .frame(height: 22)
+                .frame(height: AX.Size.elementSm)
 
-            if !state.isSupported {
-                Label("This macOS version doesn't provide the Touch Bar overlay API.", systemImage: "exclamationmark.triangle.fill")
-                    .font(.system(size: 12)).foregroundStyle(.orange)
-            } else if !state.hasTouchBar {
-                Label("No Touch Bar detected on this Mac.", systemImage: "info.circle")
-                    .font(.system(size: 12)).foregroundStyle(.secondary)
+                if !state.isSupported {
+                    AXBanner(status: .warning, title: "Not supported on this macOS",
+                             message: "The Touch Bar overlay API isn't available.")
+                } else if !state.hasTouchBar {
+                    AXBanner(status: .info, title: "No Touch Bar detected",
+                             message: "DisableBar only has an effect on MacBook Pros with a Touch Bar.")
+                }
             }
         }
-        .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(LinearGradient(colors: [Color.primary.opacity(0.06), Color.primary.opacity(0.02)],
-                                     startPoint: .top, endPoint: .bottom))
-        )
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.stroke))
+    }
+
+    private var peekLabel: String {
+        state.peekDuration >= 60 ? "\(state.peekDuration / 60) min" : "\(state.peekDuration)s"
     }
 
     private var frozenBanner: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "snowflake").font(.system(size: 18)).foregroundStyle(.cyan)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Control Strip is frozen").font(.system(size: 13, weight: .semibold))
-                Text("The ControlStrip process is suspended, so the right side of the Touch Bar won't respond or update.")
-                    .font(.system(size: 11)).foregroundStyle(.secondary)
-            }
-            Spacer()
+        AXBanner(status: .info, title: "Control Strip is frozen",
+                 message: "The ControlStrip process is suspended, so the right side of the Touch Bar won't respond.") {
             Button("Unfreeze") { state.unfreezeControlStrip() }
-                .controlSize(.small)
+                .buttonStyle(.ax(.secondary, size: .sm))
         }
-        .padding(14)
-        .background(Color.cyan.opacity(0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.cyan.opacity(0.25)))
     }
+
+    // MARK: Stats
 
     private var stats: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: AX.Space.s3) {
             TimelineView(.periodic(from: .now, by: 1)) { context in
-                StatTile(value: state.offSince.map { Format.duration(since: $0, now: context.date) } ?? "—",
-                         caption: "Off for", symbol: "timer", tint: .orange)
+                AXStat(label: "Off for",
+                       value: state.offSince.map { Format.duration(since: $0, now: context.date) } ?? "—",
+                       symbol: "timer", hue: .orange)
             }
-            StatTile(value: Format.number(state.blockedTouchesSession),
-                     caption: "Ghost touches blocked", symbol: "hand.raised.fill", tint: .pink)
-            StatTile(value: Format.number(state.blockedTouchesTotal),
-                     caption: "Blocked all-time", symbol: "shield.lefthalf.filled", tint: .purple)
+            AXStat(label: "Blocked now", value: Format.number(state.blockedTouchesSession),
+                   symbol: "hand.raised.fill", hue: .pink)
+            AXStat(label: "Blocked all-time", value: Format.number(state.blockedTouchesTotal),
+                   symbol: "shield.lefthalf.filled", hue: .purple)
         }
     }
 
-    private var behaviorCard: some View {
-        Card(title: "Behavior") {
-            SettingRow(symbol: "bolt.fill", color: .orange, title: "Turn off when DisableBar starts",
-                       subtitle: "Keep the Touch Bar dark from the moment the app launches.") {
-                Toggle("", isOn: $state.turnOffAtLaunch).labelsHidden().toggleStyle(.switch)
-            }
-            RowDivider()
-            SettingRow(symbol: "person.crop.circle.badge.checkmark", color: .blue, title: "Launch at login") {
-                Toggle("", isOn: $state.launchAtLogin).labelsHidden().toggleStyle(.switch)
-            }
-            RowDivider()
-            SettingRow(symbol: "command", color: .indigo, title: "Global shortcut",
-                       subtitle: "Press ⌃⌥⌘T anywhere to switch the Touch Bar on or off.") {
-                Toggle("", isOn: $state.hotKeyEnabled).labelsHidden().toggleStyle(.switch)
-            }
-            RowDivider()
-            SettingRow(symbol: "eye.fill", color: .teal, title: "Peek duration",
-                       subtitle: "How long “Peek” shows the Touch Bar before switching it off again.") {
-                Picker("", selection: $state.peekDuration) {
-                    Text("10s").tag(10)
-                    Text("30s").tag(30)
-                    Text("1m").tag(60)
-                    Text("5m").tag(300)
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .frame(width: 70)
-            }
-        }
-    }
+    // MARK: Settings
 
-    private var escapeCard: some View {
-        Card(title: "Escape key") {
-            SettingRow(symbol: "capslock.fill", color: .green, title: "Caps Lock acts as Esc",
-                       subtitle: "Your Mac has no physical Esc key. Remaps Caps Lock → Esc with no extra permissions.") {
-                Toggle("", isOn: $state.capsLockToEscape).labelsHidden().toggleStyle(.switch)
+    private var behaviorSection: some View {
+        AXSection(title: "Behavior") {
+            AXItem(symbol: "bolt.fill", hue: .orange, title: "Turn off when DisableBar starts",
+                   supporting: "Keep the Touch Bar dark from the moment the app launches.") {
+                axSwitch("Turn off when DisableBar starts", isOn: $state.turnOffAtLaunch)
             }
-            RowDivider()
-            SettingRow(symbol: "escape", color: .gray, title: "Keep a dim Esc key on the Touch Bar",
-                       subtitle: "Shows a faint “esc” while the bar is off. Needs Accessibility permission; ghost touches may still press it.") {
-                Toggle("", isOn: $state.showEscKey).labelsHidden().toggleStyle(.switch)
+            AXDivider()
+            AXItem(symbol: "person.crop.circle.badge.checkmark", hue: .blue, title: "Launch at login") {
+                axSwitch("Launch at login", isOn: $state.launchAtLogin)
+            }
+            AXDivider()
+            AXItem(symbol: "command", hue: .purple, title: "Global shortcut",
+                   supporting: "Press ⌃⌥⌘T anywhere to switch the Touch Bar on or off.") {
+                axSwitch("Global shortcut", isOn: $state.hotKeyEnabled)
+            }
+            AXDivider()
+            AXItem(symbol: "eye.fill", hue: .teal, title: "Peek duration",
+                   supporting: "How long Peek shows the Touch Bar.") {
+                AXSegmented(selection: $state.peekDuration, options: [
+                    .init(value: 10, title: "10s"), .init(value: 30, title: "30s"),
+                    .init(value: 60, title: "1m"), .init(value: 300, title: "5m"),
+                ], size: .sm)
+                .frame(width: 176)
             }
         }
     }
 
-    private var layoutCard: some View {
-        Card(title: "Touch Bar layout (when on)") {
-            Picker("", selection: Binding(get: { state.touchBarMode }, set: { state.setMode($0) })) {
-                ForEach(TouchBarMode.allCases) { mode in
-                    Text(mode.title).tag(mode)
-                }
+    private var escapeSection: some View {
+        AXSection(title: "Escape key", description: "Touch Bar Macs have no physical Esc key.") {
+            AXItem(symbol: "capslock.fill", hue: .green, title: "Caps Lock acts as Esc",
+                   supporting: "Remaps Caps Lock to Esc. No extra permissions needed.") {
+                axSwitch("Caps Lock acts as Esc", isOn: $state.capsLockToEscape)
             }
-            .labelsHidden()
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            AXDivider()
+            AXItem(symbol: "keyboard", hue: .gray, title: "Keep a dim Esc key on the Touch Bar",
+                   supporting: "Needs Accessibility permission. Ghost touches may still press it.") {
+                axSwitch("Keep a dim Esc key on the Touch Bar", isOn: $state.showEscKey)
+            }
         }
     }
 
-    private var troubleshootingCard: some View {
-        Card(title: "Troubleshooting") {
-            SettingRow(symbol: "arrow.clockwise", color: .red, title: "Restart Touch Bar",
-                       subtitle: "Restarts TouchBarServer and the Control Strip. Fixes a frozen or glitching bar. Asks for your password.") {
-                Button("Restart") { state.restartTouchBar() }.controlSize(.small)
+    private var layoutSection: some View {
+        VStack(alignment: .leading, spacing: AX.Space.s2) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Layout when on").axStyle(.heading4)
+                Text("What the Touch Bar shows while it's switched on.")
+                    .axStyle(.supporting, color: AX.Colors.textSecondary)
             }
-            RowDivider()
-            SettingRow(symbol: "chart.bar.fill", color: .purple, title: "Reset statistics") {
-                Button("Reset") { state.resetStats() }.controlSize(.small)
+            .padding(.horizontal, AX.Space.s1)
+            AXSegmented(selection: Binding(get: { state.touchBarMode }, set: { state.setMode($0) }),
+                        options: TouchBarMode.allCases.map { .init(value: $0, title: $0.title, symbol: $0.symbol) })
+        }
+    }
+
+    private var troubleshootingSection: some View {
+        AXSection(title: "Troubleshooting") {
+            AXItem(symbol: "arrow.clockwise", hue: .red, title: "Restart Touch Bar",
+                   supporting: "Restarts TouchBarServer and the Control Strip. Asks for your password.") {
+                Button("Restart…") { state.restartTouchBar() }
+                    .buttonStyle(.ax(.secondary, size: .sm))
+            }
+            AXDivider()
+            AXItem(symbol: "chart.bar.fill", hue: .gray, title: "Reset statistics") {
+                Button("Reset") { withAnimation(AX.Motion.medium) { state.resetStats() } }
+                    .buttonStyle(.ax(.secondary, size: .sm))
             }
         }
     }
 
     private var footer: some View {
-        Text("DisableBar covers the OLED Touch Bar with pure black, so its pixels are physically off, and absorbs every touch. Nothing is modified on your system, and quitting the app restores the Touch Bar.")
-            .font(.system(size: 11))
-            .foregroundStyle(.tertiary)
+        Text("DisableBar covers the OLED Touch Bar with pure black, so its pixels are physically off, and absorbs every touch. Nothing on your system is modified, and quitting the app restores the Touch Bar.")
+            .axStyle(.supporting, color: AX.Colors.textDisabled)
             .multilineTextAlignment(.center)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 8)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, AX.Space.s4)
     }
+
+    // MARK: Toast
 
     @ViewBuilder private var toast: some View {
         if let message = state.lastMessage {
-            Text(message)
-                .font(.system(size: 12, weight: .medium))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(.regularMaterial, in: Capsule())
-                .shadow(radius: 8, y: 2)
-                .padding(.bottom, 16)
+            let shape = RoundedRectangle(cornerRadius: AX.Radius.element, style: .continuous)
+            Label(message, systemImage: "checkmark.circle.fill")
+                .font(AX.TypeStyle.label.font)
+                .foregroundStyle(AX.Colors.textPrimary)
+                .padding(.horizontal, AX.Space.s4)
+                .frame(height: AX.Size.elementLg + 4)
+                .background(shape.fill(AX.Colors.backgroundPopover))
+                .overlay(shape.strokeBorder(AX.Colors.border))
+                .axElevation(.high, in: shape)
+                .padding(.bottom, AX.Space.s5)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
-                .animation(.spring(), value: state.lastMessage)
+                .animation(AX.Motion.medium, value: state.lastMessage)
         }
+    }
+
+    private func axSwitch(_ title: String, isOn: Binding<Bool>) -> some View {
+        Toggle(isOn: isOn) { EmptyView() }
+            .toggleStyle(AXSwitchStyle())
+            .accessibilityLabel(title)
     }
 }
