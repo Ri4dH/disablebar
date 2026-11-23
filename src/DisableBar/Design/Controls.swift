@@ -216,6 +216,7 @@ struct AXIconTile: View {
             .foregroundStyle(hue.icon)
             .frame(width: size, height: size)
             .background(hue.background, in: RoundedRectangle(cornerRadius: AX.Radius.inner + 2, style: .continuous))
+            .accessibilityHidden(true)
     }
 }
 
@@ -240,7 +241,7 @@ struct AXBadge: View {
     var body: some View {
         HStack(spacing: 6) {
             if showsDot {
-                Circle().fill(hue.icon).frame(width: 6, height: 6)
+                Circle().fill(hue.icon).frame(width: 6, height: 6).accessibilityHidden(true)
             }
             Text(text)
                 .font(AX.font(size: 12, weight: .medium))
@@ -294,6 +295,7 @@ struct AXBanner<Action: View>: View {
     var body: some View {
         HStack(alignment: .center, spacing: AX.Space.s3) {
             Image(systemName: symbol).font(.system(size: 15, weight: .semibold))
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(AX.TypeStyle.label.font)
                 if let message {
@@ -420,6 +422,10 @@ struct AXStat: View {
                     .minimumScaleFactor(0.6)
             }
         }
+        // Read as one element: "Blocked now, 26".
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(value)
     }
 }
 
@@ -439,6 +445,7 @@ struct AXMenuRow: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(AX.Colors.iconSecondary)
                     .frame(width: 18)
+                    .accessibilityHidden(true)
                 Text(title).font(AX.TypeStyle.body.font).foregroundStyle(AX.Colors.textPrimary)
                     .monospacedDigit()
                 Spacer()

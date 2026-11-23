@@ -35,6 +35,7 @@ struct MenuBarView: View {
                     .buttonStyle(.ax(.secondary, size: .sm))
                     Spacer()
                     Image(systemName: "hand.raised.fill").font(.system(size: 10)).foregroundStyle(AX.Hue.pink.icon)
+                        .accessibilityHidden(true)
                     Text("\(state.blockedTouchesSession) blocked")
                         .axStyle(.supporting, color: AX.Colors.textSecondary)
                         .monospacedDigit()

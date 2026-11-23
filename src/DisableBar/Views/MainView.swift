@@ -41,6 +41,7 @@ struct MainView: View {
             Image(nsImage: NSApp.applicationIconImage)
                 .resizable()
                 .frame(width: 44, height: 44)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text("DisableBar").axStyle(.heading2)
                 Text("Switch off a flickering Touch Bar.")
@@ -113,11 +114,6 @@ struct MainView: View {
 
     private var stats: some View {
         HStack(spacing: AX.Space.s3) {
-            TimelineView(.periodic(from: .now, by: 1)) { context in
-                AXStat(label: "Off for",
-                       value: state.offSince.map { Format.duration(since: $0, now: context.date) } ?? "—",
-                       symbol: "timer", hue: .orange)
-            }
             AXStat(label: "Blocked now", value: Format.number(state.blockedTouchesSession),
                    symbol: "hand.raised.fill", hue: .pink)
             AXStat(label: "Blocked all-time", value: Format.number(state.blockedTouchesTotal),

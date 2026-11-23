@@ -41,6 +41,9 @@ struct TouchBarPreview: View {
             .shadow(color: isOff ? .clear : Color(hex: "#6d9cfe").opacity(0.22), radius: 14)
         }
         .frame(height: height)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Touch Bar preview")
+        .accessibilityValue(isOff ? "Off" : "On")
         .animation(AX.Motion.slow, value: isOff)
         .onChange(of: blockedTouches) { _ in addRipple() }
         .task(id: isOff) { await flickerLoop() }

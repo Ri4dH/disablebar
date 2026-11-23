@@ -13,7 +13,6 @@ final class AppState: ObservableObject {
 
     @Published private(set) var isTouchBarOff = false
     @Published private(set) var peekSecondsLeft: Int?
-    @Published private(set) var offSince: Date?
     @Published private(set) var blockedTouchesSession = 0
     @Published private(set) var controlStripSuspended = false
     @Published private(set) var touchBarMode: TouchBarMode = SystemTouchBar.mode
@@ -114,14 +113,12 @@ final class AppState: ObservableObject {
         }
         if off {
             blackout.present(showEscKey: showEscKey)
-            if !isTouchBarOff { offSince = Date() }
             isTouchBarOff = true
             blockedTouchesSession = 0
             startWatchdog()
         } else {
             blackout.dismiss()
             isTouchBarOff = false
-            offSince = nil
             stopWatchdog()
         }
     }

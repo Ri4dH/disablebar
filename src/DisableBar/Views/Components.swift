@@ -17,13 +17,6 @@ struct StatusBadge: View {
 }
 
 enum Format {
-    static func duration(since date: Date, now: Date = Date()) -> String {
-        let seconds = max(0, Int(now.timeIntervalSince(date)))
-        let h = seconds / 3600, m = (seconds % 3600) / 60, s = seconds % 60
-        if h > 0 { return String(format: "%dh %02dm", h, m) }
-        return String(format: "%d:%02d", m, s)
-    }
-
     static func number(_ n: Int) -> String {
         n.formatted(.number.notation(.compactName))
     }
