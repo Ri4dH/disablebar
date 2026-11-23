@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import TouchBarPrivate
 
 @main
 struct DisableBarApp: App {
@@ -9,6 +10,7 @@ struct DisableBarApp: App {
     init() {
         // Figtree must be registered before the first view is drawn.
         AX.FontLoader.register()
+        TBInstallDimmingGuard()
     }
 
     var body: some Scene {
