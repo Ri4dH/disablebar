@@ -62,7 +62,9 @@ The interface follows Meta's open-source [**Astryx**](https://github.com/meta/as
 **Homebrew**
 
 ```sh
-brew install --cask ri4dh/tap/disablebar
+brew tap ri4dh/tap
+brew trust ri4dh/tap        # Homebrew 7+ asks you to trust third-party taps once
+brew install --cask disablebar
 ```
 
 **Download**
