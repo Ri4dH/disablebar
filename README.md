@@ -9,9 +9,10 @@
 [![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black?logo=apple)](#requirements)
 [![Swift](https://img.shields.io/badge/Swift-SwiftUI-F05138?logo=swift&logoColor=white)](#build-from-source)
 [![Apple Silicon + Intel](https://img.shields.io/badge/Apple%20Silicon%20%2B%20Intel-universal-6e5494)](#requirements)
+[![Notarized by Apple](https://img.shields.io/badge/Notarized-by%20Apple-0071e3?logo=apple)](#install)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-[Download](../../releases/latest) · [Features](#features) · [How it works](#how-it-works) · [FAQ](#faq)
+[Download](../../releases/latest) · [Install](#install) · [Features](#features) · [How it works](#how-it-works) · [FAQ](#faq)
 
 </div>
 
@@ -34,6 +35,7 @@ DisableBar adds a switch for it. It lives in your menu bar, needs no admin right
 | 🎛 **Layout switcher** | When the bar is on, choose *App Controls*, *Control Strip* or *F1–F12 keys*. |
 | 🛠 **Restart Touch Bar** | One-click restart of `TouchBarServer` + `ControlStrip`, the usual fix for a frozen bar. It also detects and un-freezes a suspended Control Strip. |
 | 🔁 **Self-healing** | Re-applies the blackout after sleep, wake, screen lock, or if macOS restarts the Touch Bar service. |
+| ⬆️ **Auto-updates** | Signed updates via [Sparkle](https://sparkle-project.org). Turn them off in the app if you prefer. |
 
 ## Screenshots
 
@@ -57,13 +59,23 @@ The interface follows Meta's open-source [**Astryx**](https://github.com/meta/as
 
 ## Install
 
-1. Download **`DisableBar.zip`** from the [latest release](../../releases/latest) and unzip it.
-2. Drag **DisableBar.app** into **Applications**.
-3. The app is ad-hoc signed (not notarized), so the first time you open it macOS will block it. Either right-click the app → **Open** → **Open**, or run:
-   ```sh
-   xattr -dr com.apple.quarantine /Applications/DisableBar.app
-   ```
-4. Look for the Touch Bar icon in your menu bar.
+**Homebrew**
+
+```sh
+brew install --cask ri4dh/tap/disablebar
+```
+
+**Download**
+
+1. Download **`DisableBar-<version>.dmg`** from the [latest release](../../releases/latest).
+2. Open it and drag **DisableBar** into **Applications**.
+3. Launch it. A short setup offers to make Caps Lock act as Esc and to start at login. After that, the app lives in your menu bar.
+
+DisableBar is signed with a Developer ID and notarized by Apple, so it opens without Gatekeeper warnings. It updates itself, too.
+
+### Privacy
+
+DisableBar collects no data and has no analytics. The only network request it makes is the update check against this repository's [appcast](../../releases/latest/download/appcast.xml), which you can switch off in the app.
 
 ### Build from source
 
@@ -75,6 +87,19 @@ cd disablebar
 ./scripts/build-app.sh            # → build/DisableBar.app (universal)
 ./scripts/build-app.sh --install  # also copies it to /Applications
 ```
+
+The script signs with your Developer ID certificate if one is in your keychain, and ad-hoc otherwise.
+
+<details>
+<summary><b>Releasing (maintainers)</b></summary>
+
+```sh
+VERSION=1.2.0 ./scripts/build-app.sh --release
+```
+
+This builds and signs the app with the hardened runtime, notarizes and staples both the app and `DisableBar-<version>.dmg`, and writes a Sparkle `appcast.xml` signed with the EdDSA key from the keychain. Attach the `.dmg`, `DisableBar-<version>.zip` and `appcast.xml` to a GitHub release tagged `v<version>`, then bump the version and `sha256` in [Ri4dH/homebrew-tap](https://github.com/Ri4dH/homebrew-tap).
+
+</details>
 
 ## How it works
 
@@ -113,7 +138,7 @@ Touch ID is a separate sensor and keeps working.
 Turn on **Caps Lock acts as Esc** in the app. It uses `hidutil`, keeps any key mappings you already have, and needs no permissions. You can also enable the dim on-bar `esc` key, which needs Accessibility permission to send the keystroke.
 
 **How do I uninstall?**
-Quit DisableBar from the menu bar and delete it from Applications. If you enabled Caps Lock → Esc, turn it off first, or log out / restart to clear it.
+Run `brew uninstall --cask disablebar`, or quit DisableBar from the menu bar and delete it from Applications. If you enabled Caps Lock → Esc, turn it off first, or log out / restart to clear it.
 
 ## Requirements
 

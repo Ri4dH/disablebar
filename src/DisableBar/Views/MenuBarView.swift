@@ -50,6 +50,9 @@ struct MenuBarView: View {
                     NSApp.activate(ignoringOtherApps: true)
                 }
                 AXMenuRow(title: "Restart Touch Bar…", symbol: "arrow.clockwise") { state.restartTouchBar() }
+                if Updater.shared.isConfigured {
+                    AXMenuRow(title: "Check for Updates…", symbol: "arrow.down.circle") { Updater.shared.checkForUpdates() }
+                }
                 AXMenuRow(title: "Quit", symbol: "xmark.circle", shortcut: "⌘Q") { NSApp.terminate(nil) }
             }
             .padding(.horizontal, -AX.Space.s2)

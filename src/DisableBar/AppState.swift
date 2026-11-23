@@ -54,6 +54,10 @@ final class AppState: ObservableObject {
     @Published var launchAtLogin: Bool {
         didSet { updateLoginItem() }
     }
+    @Published private(set) var hasCompletedOnboarding: Bool
+
+    /// Opens the main window; set by a view that has SwiftUI's `openWindow`.
+    var openMainWindow: (() -> Void)?
 
     // MARK: Private
 
@@ -64,6 +68,7 @@ final class AppState: ObservableObject {
         static let capsLock = "capsLockToEscape"
         static let hotKey = "hotKeyEnabled"
         static let peekDuration = "peekDuration"
+        static let onboarded = "hasCompletedOnboarding"
     }
 
     private let defaults = UserDefaults.standard
@@ -87,6 +92,12 @@ final class AppState: ObservableObject {
         hotKeyEnabled = defaults.bool(forKey: Keys.hotKey)
         peekDuration = defaults.integer(forKey: Keys.peekDuration)
         launchAtLogin = SMAppService.mainApp.status == .enabled
+        // People upgrading from 1.1 already know the app: skip onboarding.
+        let saved = defaults.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "") ?? [:]
+        if saved[Keys.onboarded] == nil, saved[Keys.blockedTotal] != nil || saved[Keys.turnOffAtLaunch] != nil {
+            defaults.set(true, forKey: Keys.onboarded)
+        }
+        hasCompletedOnboarding = defaults.bool(forKey: Keys.onboarded)
 
         blackout.onBlockedTouch = { [weak self] in self?.recordBlockedTouch() }
         blackout.onEscape = { [weak self] in self?.postEscape() }
@@ -98,10 +109,19 @@ final class AppState: ObservableObject {
         if capsLockToEscape { KeyRemapper.setCapsLockToEscape(true) }
         refreshSystemStatus()
         observeSystemEvents()
-        if turnOffAtLaunch { setTouchBarOff(true) }
+        if turnOffAtLaunch && hasCompletedOnboarding { setTouchBarOff(true) }
     }
 
     // MARK: - Actions
+
+    /// Applies the first-run choices and remembers that onboarding is done.
+    func completeOnboarding(capsLockToEscape: Bool, launchAtLogin: Bool, turnOff: Bool) {
+        if capsLockToEscape != self.capsLockToEscape { self.capsLockToEscape = capsLockToEscape }
+        if launchAtLogin != self.launchAtLogin { self.launchAtLogin = launchAtLogin }
+        defaults.set(true, forKey: Keys.onboarded)
+        hasCompletedOnboarding = true
+        if turnOff { setTouchBarOff(true) }
+    }
 
     func toggle() { setTouchBarOff(!isTouchBarOff || peekSecondsLeft != nil) }
 
@@ -179,6 +199,12 @@ final class AppState: ObservableObject {
         touchBarMode = SystemTouchBar.mode
         if launchAtLogin != (SMAppService.mainApp.status == .enabled) {
             launchAtLogin = SMAppService.mainApp.status == .enabled
+        // People upgrading from 1.1 already know the app: skip onboarding.
+        let saved = defaults.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "") ?? [:]
+        if saved[Keys.onboarded] == nil, saved[Keys.blockedTotal] != nil || saved[Keys.turnOffAtLaunch] != nil {
+            defaults.set(true, forKey: Keys.onboarded)
+        }
+        hasCompletedOnboarding = defaults.bool(forKey: Keys.onboarded)
         }
     }
 

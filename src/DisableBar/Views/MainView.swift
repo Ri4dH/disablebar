@@ -3,6 +3,7 @@ import SwiftUI
 /// The main window, laid out with Astryx (Neutral) tokens and components.
 struct MainView: View {
     @EnvironmentObject private var state: AppState
+    @ObservedObject private var updater = Updater.shared
 
     var body: some View {
         ScrollView {
@@ -14,6 +15,7 @@ struct MainView: View {
                 behaviorSection
                 escapeSection
                 layoutSection
+                updatesSection
                 troubleshootingSection
                 footer
             }
@@ -32,6 +34,9 @@ struct MainView: View {
         .background(AX.Colors.backgroundBody.ignoresSafeArea())
         .overlay(alignment: .bottom) { toast }
         .onAppear { state.refreshSystemStatus() }
+        .sheet(isPresented: Binding(get: { !state.hasCompletedOnboarding }, set: { _ in })) {
+            OnboardingView().environmentObject(state)
+        }
     }
 
     // MARK: Header
@@ -174,6 +179,21 @@ struct MainView: View {
             .padding(.horizontal, AX.Space.s1)
             AXSegmented(selection: Binding(get: { state.touchBarMode }, set: { state.setMode($0) }),
                         options: TouchBarMode.allCases.map { .init(value: $0, title: $0.title, symbol: $0.symbol) })
+        }
+    }
+
+    private var updatesSection: some View {
+        AXSection(title: "Updates") {
+            AXItem(symbol: "arrow.down.circle.fill", hue: .cyan, title: "Check for updates automatically",
+                   supporting: "Version \(Updater.currentVersion)") {
+                HStack(spacing: AX.Space.s3) {
+                    Button("Check now") { updater.checkForUpdates() }
+                        .buttonStyle(.ax(.secondary, size: .sm))
+                        .disabled(!updater.canCheckForUpdates)
+                    axSwitch("Check for updates automatically", isOn: $updater.automaticallyChecks)
+                        .disabled(!updater.isConfigured)
+                }
+            }
         }
     }
 

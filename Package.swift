@@ -7,6 +7,10 @@ let package = Package(
     products: [
         .executable(name: "DisableBar", targets: ["DisableBar"])
     ],
+    dependencies: [
+        // Auto-updates for the direct-download build.
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.10.0"),
+    ],
     targets: [
         // Thin Objective-C shim around the private AppKit / DFRFoundation
         // calls used to present a full-width "system modal" Touch Bar.
@@ -17,9 +21,14 @@ let package = Package(
         ),
         .executableTarget(
             name: "DisableBar",
-            dependencies: ["TouchBarPrivate"],
+            dependencies: [
+                "TouchBarPrivate",
+                .product(name: "Sparkle", package: "Sparkle"),
+            ],
             path: "src/DisableBar",
             linkerSettings: [
+                // Sparkle.framework is embedded in DisableBar.app/Contents/Frameworks.
+                .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"]),
                 .linkedFramework("AppKit"),
                 .linkedFramework("SwiftUI"),
                 .linkedFramework("Carbon"),

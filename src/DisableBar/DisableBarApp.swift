@@ -26,15 +26,59 @@ struct DisableBarApp: App {
                 .environmentObject(state)
                 .tint(AX.Colors.accent)
         } label: {
-            Image(nsImage: MenuBarIcon.image(off: state.isTouchBarOff && state.peekSecondsLeft == nil))
+            MenuBarLabel(state: state)
         }
         .menuBarExtraStyle(.window)
     }
 }
 
+/// The menu bar icon. It is always alive, so it also hands SwiftUI's
+/// `openWindow` to AppState for opening the window from AppKit code.
+private struct MenuBarLabel: View {
+    @ObservedObject var state: AppState
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Image(nsImage: MenuBarIcon.image(off: state.isTouchBarOff && state.peekSecondsLeft == nil))
+            .onAppear {
+                state.openMainWindow = {
+                    openWindow(id: "main")
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+            }
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var launchedAsLoginItem = false
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Login items are launched with keyAELaunchedAsLogInItem in the open event.
+        if let event = NSAppleEventManager.shared().currentAppleEvent,
+           event.eventID == kAEOpenApplication,
+           event.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem {
+            launchedAsLoginItem = true
+        }
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
-        MainActor.assumeIsolated { AppState.shared.start() }
+        MainActor.assumeIsolated {
+            _ = Updater.shared
+            let state = AppState.shared
+            state.start()
+            // At login, start quietly in the menu bar (unless onboarding is pending).
+            if launchedAsLoginItem && state.hasCompletedOnboarding {
+                DispatchQueue.main.async {
+                    for window in NSApp.windows where window.title == "DisableBar" { window.close() }
+                }
+            }
+        }
+    }
+
+    /// Opening the app again (Finder, Spotlight, Dock) shows the main window.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        MainActor.assumeIsolated { AppState.shared.openMainWindow?() }
+        return true
     }
 
     func applicationWillTerminate(_ notification: Notification) {
